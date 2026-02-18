@@ -1,0 +1,644 @@
+<style>
+/* ── BLOGGER SIFIRLA ── */
+html, body {
+  margin: 0 !important; padding: 0 !important;
+  width: 100% !important; height: 100% !important;
+  overflow: hidden !important; background: #1a1a2e !important;
+}
+body > *:not(#gw-app):not(#gw-music):not(script):not(link):not(style) {
+  display: none !important; height: 0 !important;
+  pointer-events: none !important; visibility: hidden !important;
+}
+
+/* ── APP ── */
+#gw-app {
+  position: fixed !important; top:0 !important; left:0 !important;
+  width:100vw !important; height:100vh !important;
+  z-index: 2147483647 !important;
+  display: flex; flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px; background: #f8f9fa; color: #333;
+  --accent: #c0392b; --dark: #2c3e50; --bg: #f8f9fa;
+  --card: #fff; --border: #ddd; --text: #333;
+}
+#gw-app[data-theme="dark"] {
+  background: #1a1a1a; color: #ecf0f1;
+  --bg:#1a1a1a; --card:#2c3e50; --border:#444; --text:#ecf0f1;
+}
+
+/* STANDBY */
+#gw-standby {
+  position:absolute; inset:0; background:rgba(0,0,0,0.9);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:white; z-index:999; cursor:pointer; text-align:center; padding:20px;
+  backdrop-filter:blur(4px);
+}
+#gw-standby h2 { margin:20px 0 8px; font-size:1.5rem; }
+#gw-standby p  { margin:0; color:#ccc; font-size:14px; }
+.gw-pulse-btn {
+  width:80px; height:80px; border-radius:50%;
+  background:#c0392b; border:none; color:white; font-size:32px;
+  cursor:pointer; box-shadow:0 0 0 0 rgba(192,57,43,.7);
+  animation:pulse 2s infinite;
+  display:flex; align-items:center; justify-content:center;
+}
+@keyframes pulse {
+  0%   { box-shadow:0 0 0 0 rgba(192,57,43,.7); }
+  70%  { box-shadow:0 0 0 20px rgba(192,57,43,0); }
+  100% { box-shadow:0 0 0 0 rgba(192,57,43,0); }
+}
+
+/* HEADER */
+#gw-header {
+  background:#2c3e50; color:white; flex-shrink:0;
+  padding:10px 14px calc(10px + env(safe-area-inset-top));
+  display:flex; flex-direction:column; gap:8px; box-sizing:border-box; width:100%;
+}
+.gw-hrow { display:flex; justify-content:space-between; align-items:center; }
+.gw-title { font-weight:700; font-size:1rem; margin:0; }
+.gw-tbtn {
+  background:none; border:none; color:#f1c40f;
+  font-size:1.2rem; cursor:pointer; padding:4px; line-height:1;
+}
+.gw-sinput {
+  width:100%; padding:8px 14px 8px 36px; border-radius:25px; border:none;
+  background:rgba(255,255,255,.15); color:white; box-sizing:border-box; font-size:13px;
+}
+.gw-sinput::placeholder { color:rgba(255,255,255,.55); }
+.gw-sinput:focus { outline:none; background:rgba(255,255,255,.25); }
+.gw-sbox { position:relative; }
+.gw-sico { position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.7; font-size:14px; }
+
+/* MAP */
+#gw-map {
+  flex-shrink:0; width:100%; height:42vh; min-height:160px;
+  border-bottom:4px solid #c0392b; position:relative; z-index:1;
+}
+@supports (height:42dvh) { #gw-map { height:42dvh; } }
+.leaflet-popup { max-width:calc(100vw - 30px) !important; }
+.leaflet-popup-content-wrapper { max-width:calc(100vw - 40px) !important; border-radius:8px; box-sizing:border-box; }
+.leaflet-popup-content { max-width:100% !important; overflow-x:hidden !important; word-break:break-word; }
+
+/* TOUR UI */
+#gw-tstatus {
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.75); color:white; padding:6px 14px; border-radius:20px;
+  font-size:12px; z-index:50; display:none; white-space:nowrap;
+  max-width:90%; overflow:hidden; text-overflow:ellipsis;
+}
+#gw-tctrl {
+  position:absolute; bottom:50px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.6); padding:8px; border-radius:30px; z-index:50;
+  display:none; gap:8px; flex-wrap:wrap; justify-content:center;
+}
+#gw-tctrl button {
+  background:#c0392b; color:white; border:none; padding:7px 14px;
+  border-radius:20px; cursor:pointer; font-size:12px;
+}
+
+/* SCROLL */
+#gw-scroll {
+  flex:1; overflow-y:auto; background:var(--bg);
+  padding:10px 12px 90px; box-sizing:border-box;
+  -webkit-overflow-scrolling:touch;
+}
+.gw-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.gw-chip {
+  padding:5px 12px; border-radius:20px; font-size:12px; cursor:pointer;
+  background:var(--card); border:1px solid var(--border); color:var(--text);
+  transition:.2s; white-space:nowrap;
+}
+.gw-chip:hover, .gw-chip.on { background:#c0392b; color:white; border-color:#c0392b; }
+
+/* CARDS */
+.gw-card {
+  background:var(--card); border-radius:10px; margin-bottom:10px;
+  border:1px solid var(--border); overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,.05);
+}
+.gw-ch {
+  padding:12px 14px; font-weight:600; cursor:pointer;
+  border-left:5px solid #c0392b; display:flex; justify-content:space-between; align-items:center;
+  font-size:13px;
+}
+.gw-cb { max-height:0; overflow:hidden; transition:max-height .4s ease; }
+.gw-cb.open { max-height:999999px; }
+
+.gw-pt { padding:12px 14px; border-bottom:1px solid var(--border); }
+.gw-pt-name { font-weight:600; margin-bottom:3px; font-size:13px; }
+.gw-pt-desc { font-size:12px; opacity:.75; margin-bottom:8px; line-height:1.4; }
+.gw-intro {
+  font-size:12px; background:#fff3cd; border-left:4px solid #e67e22;
+  border-radius:5px; padding:9px; margin:6px 0; line-height:1.5;
+}
+#gw-app[data-theme="dark"] .gw-intro { background:#3a2e00; }
+.gw-meta { font-size:12px; margin:6px 0; opacity:.8; }
+.gw-acts { display:flex; gap:6px; margin:8px 0; flex-wrap:wrap; }
+.gw-abtn {
+  flex:1; min-width:60px; padding:7px 5px; border-radius:6px; font-size:11px; font-weight:600;
+  text-align:center; text-decoration:none; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:3px;
+}
+.ab-map   { background:#ecf0f1; color:#2c3e50; }
+.ab-earth { background:#e8f5e9; color:#1b5e20; }
+.ab-share { background:#e3f2fd; color:#0d47a1; }
+
+/* READING */
+.gw-rh {
+  font-weight:700; font-size:12px; color:#2c3e50; padding:7px 0;
+  border-bottom:2px solid #c0392b; margin:12px 0 8px;
+}
+#gw-app[data-theme="dark"] .gw-rh { color:#ecf0f1; }
+.gw-paper {
+  margin-bottom:12px; padding:9px; border-left:4px solid #c0392b;
+  border-radius:5px; background:#fff8f8; font-size:12px; line-height:1.5;
+}
+#gw-app[data-theme="dark"] .gw-paper { background:#2a1a1a; }
+.gw-pq    { font-weight:700; color:#c0392b; font-size:11px; }
+.gw-ptit  { font-weight:600; margin:3px 0; font-size:12px; }
+.gw-pdoi  { color:#666; margin-bottom:3px; }
+.gw-pdoi a { color:#c0392b; word-break:break-all; }
+.gw-play  { font-style:italic; color:var(--text); }
+
+/* COMMENTS */
+.gw-cmts { margin-top:8px; padding:6px; background:rgba(0,0,0,.03); border-radius:5px; }
+.gw-cmts h5 { margin:3px 0 6px; font-size:12px; }
+.gw-cmts textarea {
+  width:100%; box-sizing:border-box; font-size:12px; padding:5px;
+  border:1px solid var(--border); border-radius:4px; resize:vertical;
+}
+.gw-cmts button {
+  margin-top:4px; padding:4px 10px; background:#c0392b; color:white;
+  border:none; border-radius:4px; cursor:pointer; font-size:12px;
+}
+.gw-clist { max-height:80px; overflow-y:auto; margin-bottom:5px; }
+.gw-citem { font-size:12px; padding:2px 0; border-bottom:1px solid var(--border); }
+
+/* MUSIC BAR */
+#gw-music {
+  position:fixed; bottom:0; left:0; width:100%; box-sizing:border-box;
+  background:rgba(10,10,10,.97); backdrop-filter:blur(10px);
+  padding:9px 14px calc(9px + env(safe-area-inset-bottom));
+  display:flex; align-items:center; justify-content:space-between;
+  color:white; z-index:2147483646; border-top:1px solid #333;
+}
+.gw-mctrl {
+  width:38px; height:38px; border-radius:50%; border:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:16px;
+}
+
+/* RUPTURE INFO */
+.gw-ri { margin-top:7px; background:#c0392b; color:white; padding:7px; border-radius:5px; font-size:12px; }
+.guide-popup .leaflet-popup-content-wrapper { background:rgba(0,0,0,.88); color:white; }
+.guide-popup .leaflet-popup-tip           { background:rgba(0,0,0,.88); }
+.gw-snippet {
+  font-style:italic; font-weight:600; margin-bottom:8px; color:#ffebee;
+  background:rgba(192,57,43,.3); padding:8px; border-radius:6px; line-height:1.4; font-size:13px;
+}
+</style>
+
+
+
+<!-- ANA UYGULAMA -->
+<div id="gw-app">
+
+  <!-- Standby -->
+  <div id="gw-standby" onclick="gwStart()">
+    <button class="gw-pulse-btn">▶</button>
+    <h2>🌍 Deprem Göçü Geowalk</h2>
+    <p>Kuzey Anadolu Fayı — 1939 → 1999<br>Başlamak için dokun veya tıkla</p>
+  </div>
+
+  <!-- Header -->
+  <div id="gw-header">
+    <div class="gw-hrow">
+      <h1 class="gw-title">🏚 DEPREM GÖÇÜ GEOWALK</h1>
+      <button class="gw-tbtn" onclick="gwTheme()" title="Tema değiştir" id="gw-ticon">🌙</button>
+    </div>
+    <div class="gw-sbox">
+      <span class="gw-sico">🔍</span>
+      <input class="gw-sinput" type="text" id="gw-q"
+        placeholder="Ara: 1939, sag pond, Ladik, offset..."
+        oninput="gwFilter(this.value)">
+    </div>
+  </div>
+
+  <!-- Harita -->
+  <div id="gw-map">
+    <div id="gw-tstatus"></div>
+    <div id="gw-tctrl" style="display:none;">
+      <button onclick="gwPause()">⏸ Durdur</button>
+      <button onclick="gwNext()">⏭ Sonraki</button>
+      <button id="gw-rbtn" onclick="gwResume()" style="display:none;">▶ Devam</button>
+    </div>
+  </div>
+
+  <!-- Scroll -->
+  <div id="gw-scroll">
+    <div class="gw-chips">
+      <div class="gw-chip on" onclick="gwReset()">🏠 Hepsi</div>
+      <div class="gw-chip" onclick="gwLocate()">📍 Konumum</div>
+      <div class="gw-chip" onclick="gwRuptures()">🟥 Kırık Hattı</div>
+      <div class="gw-chip" style="background:#27ae60;color:white;border-color:#27ae60" onclick="gwTour()">▶ Sanal Tur</div>
+    </div>
+    <div id="gw-cards"></div>
+  </div>
+
+</div><!-- #gw-app -->
+
+<!-- Müzik barı — body'de direkt, fixed -->
+<div id="gw-music">
+  <div>
+    <div style="font-weight:700;color:#e74c3c;font-size:12px;">📻 Anadolu Sesi</div>
+    <div id="gw-tname" style="font-size:11px;opacity:.7;">Uzun İnce Bir Yoldayım</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="gw-mctrl" style="background:#34495e;" onclick="gwVoice()">🎙</button>
+    <button class="gw-mctrl" id="gw-pbtn" style="background:#c0392b;" onclick="gwMusic()">▶</button>
+  </div>
+</div>
+
+<!-- Leaflet JS — çoklu CDN fallback -->
+<script>
+// Leaflet yükleme — 3 farklı CDN dene
+
+</script>
+
+<script>
+// ══════════════════════════════
+// BLOGGER KAPATMA
+// ══════════════════════════════
+(function() {
+  function hide() {
+    // body'deki tüm Blogger elementlerini gizle
+    Array.from(document.body.children).forEach(function(el) {
+      if (el.id !== 'gw-app' && el.id !== 'gw-music' &&
+          el.tagName !== 'SCRIPT' && el.tagName !== 'LINK' && el.tagName !== 'STYLE') {
+        el.style.cssText = 'display:none!important;visibility:hidden!important;height:0!important;' +
+          'overflow:hidden!important;position:absolute!important;top:-9999px!important;pointer-events:none!important;';
+      }
+    });
+    // Bilinen Blogger seçicileri
+    ['.header-outer','.header-inner','.header-wrapper','.header-wrapper-inner',
+     '.footer-outer','.footer-inner','.sidebar-outer','.sidebar-wrapper',
+     '.sidebar-container','.sidebar-right-1','.tabs-outer','.page-header',
+     '#header','#footer','.blog-pager','#blog-pager','.attribution-gadget',
+     '.post-header','.post-footer','.post-title','.post-title-link',
+     '.byline','.post-share-buttons','.reactions','.post-comment-link',
+     '#navbar-iframe','.navbar','.navbar-iframe'
+    ].forEach(function(s) {
+      document.querySelectorAll(s).forEach(function(el) {
+        el.style.cssText = 'display:none!important;height:0!important;overflow:hidden!important;';
+      });
+    });
+  }
+  hide();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hide);
+  }
+  if (window.MutationObserver) {
+    var obs = new MutationObserver(hide);
+    obs.observe(document.body, { childList: true });
+    setTimeout(function() { obs.disconnect(); }, 8000);
+  }
+})();
+
+// ══════════════════════════════
+// VERİ
+// ══════════════════════════════
+var PTS = [
+  { name:'1939 Erzincan Depremi',       lat:39.77, lon:39.58, desc:'Mw 7.9 – 27 Aralık 1939. ~33.000 can kaybı. Yüzey kırığı ~360 km, max sağ yanal atım ~10.5 m.' },
+  { name:'1942 Niksar-Erbaa Depremi',   lat:40.87, lon:36.47, desc:'Mw 7.0 – 20 Aralık 1942. Erbaa ovasında offset tarlalar ve sag pond\'lar.' },
+  { name:'1943 Tosya-Ladik Depremi',    lat:40.87, lon:33.65, desc:'Mw 7.6 – 26 Kasım 1943. Ladik Gölü kıyısında deformasyon ve göl ikiye bölünmesi.' },
+  { name:'1944 Bolu-Gerede Depremi',    lat:40.81, lon:32.23, desc:'Mw 7.3 – 1 Şubat 1944. Gerede ovasında step-over zonları ve ~3 m sağ yanal atım.' },
+  { name:'1957 Abant Depremi',          lat:40.95, lon:31.28, desc:'Mw 7.1 – 26 Mayıs 1957. Abant tektonik gölü ve fay çiçek yapıları.' },
+  { name:'1967 Mudurnu Vadisi Depremi', lat:40.78, lon:30.40, desc:'Mw 7.1 – 22 Temmuz 1967. Adapazarı ovasında sıvılaşma ve deformasyon izleri.' },
+  { name:'1999 Gölcük-Düzce Depremi',  lat:40.70, lon:29.91, desc:'Mw 7.4+7.2 – 1999. Hersek deltası, Eften Gölü ve Akyazı-Gölyaka\'da max 5.2 m atım.' }
+];
+
+var E3D = [
+  'https://earth.google.com/web/@39.77,39.58,2500a,90h,65t,0r',
+  'https://earth.google.com/web/@40.87,36.47,1200a,45h,55t,0r',
+  'https://earth.google.com/web/@40.87,33.65,1800a,180h,60t,0r',
+  'https://earth.google.com/web/@40.81,32.23,1500a,270h,70t,0r',
+  'https://earth.google.com/web/@40.95,31.28,2000a,0h,50t,0r',
+  'https://earth.google.com/web/@40.78,30.40,2200a,135h,60t,0r',
+  'https://earth.google.com/web/@40.70,29.91,1800a,225h,45t,0r'
+];
+
+var SNIP = [
+  '900 km\'lik göçün başlangıç ateşi – Erzincan\'da 360 km\'lik hat doğudan batıya açıldı.',
+  'Erbaa ovasında offset tarlalar ve sag pond\'lar oluştu – fay hareketi burada somutlaştı.',
+  'Ladik Gölü\'nün kıyısı bu depremle değişti – göl ikiye bölündü, izler kaldı.',
+  'Gerede step-over zonu KAFZ\'nin en karmaşık morfolojisidir – çöküntü basenleri belirgindir.',
+  'Abant tektonik gölü ve fay çiçek yapıları oluştu – vadi morfolojisi değişti.',
+  'Mudurnu\'da atım izleri netleşti – Adapazarı ovasında sıvılaşma deformasyonları görüldü.',
+  'Hersek Deltası deformasyonu DEM\'de en net kırıktır – Marmara\'ya stres transferi başladı.'
+];
+
+var RUPS = {
+  e39:[[39.77,39.58],[39.85,39.90],[40.00,38.50],[40.10,37.80]],
+  e42:[[40.87,36.47],[40.90,36.40]],
+  e43:[[40.87,33.65],[40.95,33.50]],
+  e44:[[40.81,32.23],[40.85,32.10]],
+  e57:[[40.95,31.28],[41.00,31.20]],
+  e67:[[40.78,30.40],[40.85,30.30]],
+  e99:[[40.70,29.91],[40.75,30.00],[40.90,31.00]]
+};
+
+var READING = [
+  { intro:'<strong>1939 Erzincan – Kırık Hattı (~360 km):</strong> Sağ yanal atım bazı noktalarda 10 m\'yi aşmıştır. DEM görüntüsünde tarlalar, dereler ve yollar bir cetvel gibi sağa kaymış görünür. Bu hareket tek düz bir çizgide değil geniş bir kırık kuşağında gerçekleşmiştir.',
+    papers:[
+      {q:'Q1',j:'Nature',doi:'10.1038/375479a0',t:'Seismic and aseismic slip on the Northern Anatolian Fault',l:'Fay bazen yavaş sessizce, bazen ani sıçrayarak kayar. Arazideki her kırık izi bu iki hareketin birikmiş ürünüdür.'},
+      {q:'Q2',j:'Geophys. J. Int.',doi:'10.1046/j.1365-246X.2003.01904.x',t:'The 1939 Erzincan earthquake: fault geometry and rupture propagation',l:'Kırığın doğudan batıya "koştuğunu" ve farklı kollar açtığını gösteriyor. Haritadaki karmaşık kırık yapısını anlamak için temel kaynak.'},
+      {q:'Q3',j:'Turkish J. Earth Sci.',doi:'10.3906/yer-1501-23',t:'Surface rupture and paleoseismology of the 1939 Erzincan earthquake',l:'Hendek kazısıyla 1939 öncesi deprem izleri de bulunmuş. Aynı hat geçmişte de kırılmış — tarihsel bellek burada gizli.'},
+      {q:'Q4',j:'Bulletin MRE',doi:'10.19111/bulletinofmre.300501',t:'Morphotectonic analysis of the NAF Zone near Erzincan',l:'Yamuk akarsu kanalları ve düzleşmiş ovalar yüzyıllık fay hareketinin eseridir. Haritaya bakarken bunları artık görebilirsin.'}
+    ]
+  },
+  { intro:'<strong>1942 Niksar-Erbaa – Offset Tarlalar ve Sag Pond\'lar (~50 km):</strong> Tarlalar ve yollar sağa kaymış, çukur alanlarda sag pond göletler oluşmuştur. Sag pond: fay kolları arasında zemin çöktüğünde su biriken doğal çukur.',
+    papers:[
+      {q:'Q1',j:'Geophys. Res. Lett.',doi:'10.1029/2000GL011855',t:'Slip rate and seismic hazard on the northern strand of the NAF Zone',l:'Yılda birkaç cm kayma birikince yüzyıllar sonra büyük deprem geliyor. Niksar bölgesinin kırık hız ölçümleri burada.'},
+      {q:'Q2',j:'Quaternary Int.',doi:'10.1016/j.quaint.2009.01.008',t:'Geomorphic evidence for Holocene earthquakes: offsets, sag ponds and fault scarps',l:'Kaymış çit, yamuk dere, çukur gölet — arazide neye bakacağını bu makale öğretiyor.'},
+      {q:'Q3',j:'Annals of Geophysics',doi:'10.4401/ag-3547',t:'Paleoseismological trench study across the NAF at Gerede',l:'Hendek kazısındaki eski toprak katmanları geçmiş depremlerin izlerini saklıyor. Niksar hattını anlamak için güçlü karşılaştırma.'},
+      {q:'Q4',j:'J. Geodynamics',doi:'10.1016/j.jog.2011.08.002',t:'Tectonic geomorphology of the Niksar-Erbaa segment, NAF Zone',l:'Ovanın bir kenarı neden yüksek? Dere neden sarp döndü? Bu çalışma tüm soruları yanıtlıyor.'}
+    ]
+  },
+  { intro:'<strong>1943 Tosya-Ladik – Göl Deformasyonu (~280 km):</strong> Ladik Gölü\'nün kıyı çizgisi değişmiş, bazı bölümler alçalmış ya da yükselmiştir. DEM\'de gölün yanındaki düz çizgi fay geçişini ele verir.',
+    papers:[
+      {q:'Q1',j:'BSSA',doi:'10.1785/0120160062',t:'Coseismic deformation and kinematics of the 1943 Tosya earthquake',l:'Deprem anındaki zemin hareketi ölçülmüş. Gölün kıyısı neden aniden değişti ve sahada nasıl görünüyor.'},
+      {q:'Q2',j:'J. Seismology',doi:'10.1023/A:1026516314017',t:'Lake shoreline deformation: 1943 NAF earthquake, Ladik Lake',l:'Eski fotoğraflarla kıyaslayarak Ladik Gölü\'ndeki kıyı değişimi belgelenmiş. "Gölün ikiye bölünmesi" efsanesinin bilimsel temeli.'},
+      {q:'Q3',j:'Geodinamica Acta',doi:'10.1080/09853111.2004.10600592',t:'NAF displacement and slip rates from geomorphic analysis, Tosya segment',l:'Küçük vadi sapmaları aslında binlerce yıllık birikimin ürünü. Bu makale bunu somutlaştırıyor.'},
+      {q:'Q4',j:'Turkish J. Earth Sci.',doi:'10.3906/yer-1801-15',t:'Sedimentary record of earthquake-triggered changes, Ladik Lake',l:'Gölün tabanındaki çamur katmanları doğanın kendi deprem arşivi. 1943 izi karot örneklerinde birebir okunuyor.'}
+    ]
+  },
+  { intro:'<strong>1944 Bolu-Gerede – Step-Over Zonu (~190 km):</strong> Gerede\'deki fay tek çizgi değil paralel kollar halinde ilerler. Kolların birinden diğerine atladığı "step-over" noktalarında çöküntü havzaları oluşur — düz ovalar ve bataklıklar bunların yüzey yansımalarıdır.',
+    papers:[
+      {q:'Q1',j:'J. Geophys. Res.',doi:'10.1029/2003JB002618',t:'Paleoseismology of the NAF at Gerede: recurrence of large earthquakes',l:'Hendek kazısı geçmiş depremlerin katmanlarını ortaya koydu. 1944 "sırası gelen" depremdi.'},
+      {q:'Q2',j:'Tectonophysics',doi:'10.1016/j.tecto.2010.09.013',t:'Pull-apart basins and step-over geometry along the 1944 rupture',l:'Fay neden düz çizgi değil? Sapmalar neden çöküntü oluşturur? Ovanın ortasındaki çukurların sırrı burada.'},
+      {q:'Q3',j:'Annali di Geofisica',doi:'10.4401/ag-3559',t:'Slip distribution of the 1944 Bolu-Gerede earthquake',l:'Farklı noktalarda farklı kayma miktarları. Koldan kola atlayan kırık enerjiyi eşitsiz dağıttı.'},
+      {q:'Q4',j:'Bulletin MRE',doi:'10.19111/bulletinofmre.413987',t:'Geomorphic response to the 1944 NAF rupture in the Gerede Basin',l:'Havadan fotoğraflar ve arazi ölçümleriyle küçük kırık basamakları belgelenmiş. Tarlalar arasında hâlâ görünüyor.'}
+    ]
+  },
+  { intro:'<strong>1957 Abant – Tektonik Göl ve Çiçek Yapısı:</strong> Abant Gölü fay tarafından yaratılmıştır — sağ yanal fayın pull-apart havzası. 1957 depremi "çiçek yapısı" (flower structure) denilen fay kollanmasını yeniden canlandırdı. DEM\'de vadi ağının asimetrisi dikkat çekicidir.',
+    papers:[
+      {q:'Q1',j:'Geomorphology',doi:'10.1016/j.geomorph.2014.04.005',t:'Tectonic origin and Quaternary evolution of Abant lake basin, NAF Zone',l:'Gölün basamaklı kıyıları, derin suları ve asimetrik şekli — hepsinin altında tektonik bir hikâye. Gerçek yaratıcı: fay.'},
+      {q:'Q2',j:'J. Structural Geology',doi:'10.1016/j.jsg.2012.08.007',t:'Flower structure and transpressional tectonics along the NAF at Abant',l:'Fay derinlikten yüzeye çiçek gibi kollanır. Sahada gördüğün paralel çizgiler bu çiçeğin yapraklarıdır.'},
+      {q:'Q3',j:'Turkish J. Earth Sci.',doi:'10.3906/yer-0903-28',t:'The 1957 Abant earthquake and morphological evolution of Mudurnu Valley',l:'Vadinin düz görünmesinin nedeni fayın uzun vadeli oyma işi. Bu makale bunu adım adım anlatıyor.'},
+      {q:'Q4',j:'Quaternary Sci. Rev.',doi:'10.1016/j.quascirev.2017.09.014',t:'Abant Lake as a paleoseismic archive',l:'Gölün tabanı binlerce yıllık deprem tarihini saklıyor. Hem manzara hem deprem kütüphanesi.'}
+    ]
+  },
+  { intro:'<strong>1967 Mudurnu Vadisi – Sıvılaşma ve Atım İzleri (~80 km):</strong> Sapkın dereler, kaymış çitler ve yerinden oynamış yol kenarları bugün hâlâ görülebilir. Adapazarı\'nda gevşek zemin sıvılaşma yaşar: zemin su gibi akar, binalar batar. Bu deprem 1999\'un provasıydı.',
+    papers:[
+      {q:'Q1',j:'BSSA',doi:'10.1785/0120000226',t:'Surface rupture of the 1967 Mudurnu Valley earthquake vs. 1999 Izmit',l:'32 yıl arayla aynı fay hattı, benzer atım. Fayın "belleği" var — aynı zayıf hattı tekrar tekrar kırıyor.'},
+      {q:'Q2',j:'Tectonophysics',doi:'10.1016/S0040-1951(00)00091-3',t:'Geomorphic evidence for active faulting along Mudurnu Valley segment',l:'Uydu görüntüleri + saha çalışması: kaymış dereler, basamaklı arazi, fay sırtları. Sahaya çıkınca neye bakacağını gösteriyor.'},
+      {q:'Q3',j:'Engineering Geology',doi:'10.1016/j.enggeo.2005.09.015',t:'Liquefaction potential and site effects in the 1967 Mudurnu earthquake',l:'Sıvılaşma: zemin depremde su gibi akmaya başlar. Adapazarı sahası bu makaleyle anlaşılır.'},
+      {q:'Q4',j:'Bulletin MRE',doi:'10.19111/bulletinofmre.367921',t:'Offset stream channels and slip rates along the 1967 NAF rupture',l:'"L" şeklinde akan dere fayın geçtiğini söyler. Sapkın kanallardan yıllık kayma hızı hesaplanmış.'}
+    ]
+  },
+  { intro:'<strong>1999 Gölcük-Düzce – Kırılma Göçünün Finali:</strong> Mw 7.4 (17 Ağustos) + Mw 7.2 (12 Kasım). Hersek Deltası anında kaydı, kıyı çizgisi değişti. Akyazı-Gölyaka\'da max 5.2 m atım ölçüldü. DEM ve uydu görüntülerinde kırık hattı çarpıcı biçimde görünür.',
+    papers:[
+      {q:'Q1',j:'BSSA',doi:'10.1785/0120000577',t:'Fault geometry and slip of the 1999 Izmit earthquake: InSAR+GPS',l:'Uydu radarıyla her noktada ne kadar kaydığı haritalandı. Depremin coğrafi imzası — sahada gördüğün her iz burada.'},
+      {q:'Q2',j:'Geophys. Res. Lett.',doi:'10.1029/1999GL010775',t:'The 1999 Izmit and Düzce earthquakes: rupture and fault planes',l:'İki deprem birbirini nasıl tetikledi? Gölcük\'ten 87 gün sonra neden Düzce kırıldı? Yanıt burada.'},
+      {q:'Q3',j:'Earth Planet. Sci. Lett.',doi:'10.1016/S0012-821X(00)00185-8',t:'Hersek Delta coseismic deformation during the 1999 Izmit earthquake',l:'Delta depremin fotoğrafını çekti — kıyı anında değişti. DEM\'de de net görünen bu değişim en çarpıcı doğal belgelerden.'},
+      {q:'Q4',j:'Geophys. J. Int.',doi:'10.1046/j.1365-246X.2002.01801.x',t:'Post-seismic deformation and stress transfer after the 1999 Marmara earthquakes',l:'Depremden sonra zemin yıllarca sessizce hareket etti. Marmara altına aktarılan stres İstanbul riskini artırdı.'}
+    ]
+  }
+];
+
+// ══════════════════════════════
+// UYGULAMA İNİT
+// ══════════════════════════════
+var gwMap = null, gwMarkerLayer = null, gwRupLayers = [], gwUserMk = null;
+var gwTourIdx = 0, gwTourOn = false, gwTourTimer = null;
+
+function initApp(hasLeaflet) {
+  // Harita
+  if (hasLeaflet) {
+    gwMap = L.map('gw-map', { center:[40.5,35.0], zoom:7 });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution:'© OpenStreetMap' }).addTo(gwMap);
+    L.tileLayer('https://tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png',
+      { opacity:0.4, attribution:'Hillshade' }).addTo(gwMap);
+    gwMarkerLayer = L.layerGroup().addTo(gwMap);
+    PTS.forEach(function(pt, i) {
+      var mk = L.marker([pt.lat,pt.lon]).addTo(gwMarkerLayer);
+      mk.bindPopup(
+        '<b>'+pt.name+'</b><br><small>'+pt.desc+'</small>'+
+        '<div class="gw-ri">DEM hillshade ile fay izlerini inceleyin.</div>'+
+        '<a href="'+E3D[i]+'" target="_blank" style="display:block;margin-top:8px;padding:8px;background:#c0392b;color:white;text-align:center;border-radius:5px;text-decoration:none;">🌍 3D Earth\'te İncele</a>'
+      );
+    });
+  }
+
+  // Kartları render et
+  renderCards();
+}
+
+function renderCards() {
+  var html = '<div class="gw-card">';
+  html += '<div class="gw-ch" onclick="this.nextElementSibling.classList.toggle(\'open\')">🔴 Kuzey Anadolu Fayı Deprem Göçü (1939–1999) &nbsp;▼</div>';
+  html += '<div class="gw-cb open">';
+
+  PTS.forEach(function(pt, i) {
+    var rd = READING[i];
+    var ph = rd.papers.map(function(p) {
+      return '<div class="gw-paper">'+
+        '<div class="gw-pq">'+p.q+' &nbsp;|&nbsp; '+p.j+'</div>'+
+        '<div class="gw-ptit">'+p.t+'</div>'+
+        '<div class="gw-pdoi">DOI: <a href="https://doi.org/'+p.doi+'" target="_blank">'+p.doi+'</a></div>'+
+        '<div class="gw-play">'+p.l+'</div>'+
+      '</div>';
+    }).join('');
+
+    html += '<div class="gw-pt" data-s="'+pt.name.toLowerCase()+' '+pt.desc.toLowerCase()+'">';
+    html += '<div class="gw-pt-name">'+pt.name+'</div>';
+    html += '<div class="gw-pt-desc">'+pt.desc+'</div>';
+    html += '<div class="gw-intro">'+rd.intro+'</div>';
+    html += '<div class="gw-meta">📍 Rota: ~10-20 km &nbsp;•&nbsp; ⏱ 5-8 saat &nbsp;•&nbsp; 🏔 Orta-Zor &nbsp;•&nbsp; 🗺 DEM hillshade</div>';
+    html += '<div class="gw-acts">';
+    html += '<button class="gw-abtn ab-map" onclick="gwFly('+pt.lat+','+pt.lon+')">📍 Haritaya Git</button>';
+    html += '<a href="'+E3D[i]+'" target="_blank" class="gw-abtn ab-earth">🌍 3D Earth</a>';
+    html += '<button class="gw-abtn ab-share" onclick="gwShare(\''+pt.name+'\')">🔗 Paylaş</button>';
+    html += '</div>';
+    html += '<div class="gw-rh">📘 Suggested for Reading (SCI Q1–Q4)</div>';
+    html += ph;
+    html += '<div class="gw-cmts"><h5>Yorumlar</h5>';
+    html += '<div class="gw-clist" id="cl'+i+'"></div>';
+    html += '<textarea id="ci'+i+'" rows="2" placeholder="Yorum yazın..."></textarea>';
+    html += '<button onclick="gwCmt('+i+')">Gönder</button></div>';
+    html += '</div>'; // .gw-pt
+  });
+
+  html += '</div></div>'; // .gw-cb .gw-card
+  document.getElementById('gw-cards').innerHTML = html;
+}
+
+// ── TUR ──
+function gwTour() {
+  if (gwTourOn || !gwMap) return;
+  gwTourOn = true; gwTourIdx = 0;
+  gwTourUI(); gwTourStep();
+}
+function gwTourStep() {
+  if (!gwTourOn || gwTourIdx >= PTS.length) { gwTourEnd(); return; }
+  var pt = PTS[gwTourIdx];
+  gwMap.flyTo([pt.lat,pt.lon], 10, {duration:3});
+  L.popup({autoClose:false,closeOnClick:false,className:'guide-popup'})
+    .setLatLng([pt.lat,pt.lon])
+    .setContent('<div class="gw-snippet">'+SNIP[gwTourIdx]+'</div>'+
+      '<strong>'+pt.name+'</strong><br><small>'+pt.desc+'</small><br><br>'+
+      '<a href="'+E3D[gwTourIdx]+'" target="_blank" onclick="gwPause()" '+
+      'style="display:inline-block;padding:9px 14px;background:#c0392b;color:white;'+
+      'text-decoration:none;border-radius:7px;font-weight:bold;">🌍 3D Earth\'te İncele</a>')
+    .openOn(gwMap);
+  gwTourIdx++;
+  gwTourUI();
+  gwTourTimer = setTimeout(gwTourStep, 9000);
+}
+function gwNext() { clearTimeout(gwTourTimer); gwTourStep(); }
+function gwPause() {
+  clearTimeout(gwTourTimer); gwTourOn = false; gwTourUI();
+  if (gwMap) gwMap.closePopup();
+  document.getElementById('gw-rbtn').style.display = 'inline-block';
+}
+function gwResume() {
+  document.getElementById('gw-rbtn').style.display = 'none';
+  gwTourOn = true; gwTourStep();
+}
+function gwTourEnd() {
+  gwTourOn = false; clearTimeout(gwTourTimer); gwTourUI();
+  if (gwMap) {
+    gwMap.closePopup();
+    gwMap.setView([40.5,35.0],7);
+    L.popup().setLatLng([40.5,35.0])
+      .setContent('<strong>✅ Tur Tamamlandı!</strong><br><br>1939–1999 arasında ~900 km\'lik KAFZ kırılması batıya göç etti.')
+      .openOn(gwMap);
+  }
+}
+function gwTourUI() {
+  var st = document.getElementById('gw-tstatus');
+  var tc = document.getElementById('gw-tctrl');
+  if (gwTourOn) {
+    var idx = Math.min(gwTourIdx, PTS.length-1);
+    st.textContent = 'Tur: '+PTS[idx].name+' ('+gwTourIdx+'/'+PTS.length+')';
+    st.style.display = 'block'; tc.style.display = 'flex';
+  } else { st.style.display = 'none'; tc.style.display = 'none'; }
+}
+
+// ── HARİTA YARDIMCıLAR ──
+function gwFly(lat,lon) { if (gwMap) gwMap.setView([lat,lon],12); }
+function gwReset() {
+  document.querySelectorAll('.gw-pt').forEach(function(p){ p.style.display=''; });
+  if (gwMap) gwMap.setView([40.5,35.0],7);
+}
+function gwLocate() {
+  if (!navigator.geolocation) { alert('Geolocation desteklenmiyor.'); return; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    if (!gwMap) return;
+    if (gwUserMk) gwMap.removeLayer(gwUserMk);
+    gwUserMk = L.marker([pos.coords.latitude,pos.coords.longitude])
+      .addTo(gwMap).bindPopup('📍 Konumunuz').openPopup();
+    gwMap.setView([pos.coords.latitude,pos.coords.longitude],10);
+  }, function(){ alert('Konum alınamadı.'); });
+}
+function gwRuptures() {
+  if (!gwMap) return;
+  if (gwRupLayers.length) {
+    gwRupLayers.forEach(function(l){ gwMap.removeLayer(l); });
+    gwRupLayers = [];
+  } else {
+    Object.values(RUPS).forEach(function(c) {
+      gwRupLayers.push(L.polyline(c,{color:'#c0392b',weight:5,opacity:.7,dashArray:'10'}).addTo(gwMap));
+    });
+  }
+}
+
+// ── ARAMA ──
+function gwFilter(v) {
+  v = v.toLowerCase();
+  document.querySelectorAll('.gw-pt').forEach(function(p) {
+    p.style.display = p.dataset.s.includes(v) ? '' : 'none';
+  });
+}
+
+// ── TEMA ──
+function gwTheme() {
+  var app = document.getElementById('gw-app');
+  var dark = app.getAttribute('data-theme') === 'dark';
+  app.setAttribute('data-theme', dark ? '' : 'dark');
+  document.getElementById('gw-ticon').textContent = dark ? '🌙' : '☀️';
+}
+
+// ── SES ──
+var gwAudio = new Audio(), gwPL = [
+  {t:'Uzun İnce Bir Yoldayım', s:'https://cdn.pixabay.com/download/audio/2022/03/15/audio_sample.mp3'},
+  {t:'Çökertme', s:'https://cdn.pixabay.com/download/audio/2022/04/10/audio_sample2.mp3'}
+], gwTI = 0;
+function gwMusic() {
+  if (gwAudio.paused) {
+    gwAudio.src = gwPL[gwTI].s; gwAudio.play();
+    document.getElementById('gw-pbtn').textContent = '⏸';
+    document.getElementById('gw-tname').textContent = gwPL[gwTI].t;
+  } else {
+    gwAudio.pause();
+    document.getElementById('gw-pbtn').textContent = '▶';
+  }
+}
+function gwVoice() { alert('Sesli rehber: Kırılma göçü başlıyor...'); }
+
+// ── START (standby tıklama) ──
+function gwStart() {
+  document.getElementById('gw-standby').style.display = 'none';
+  if (gwMap) { setTimeout(function(){ gwMap.invalidateSize(); }, 200); }
+  gwMusic();
+}
+
+// ── YORUM ──
+function gwShare(n) {
+  if (navigator.share) { navigator.share({title:n, text:n+' — KAFZ Geowalk', url:location.href}); }
+  else { alert(n + ' kopyalandı: ' + location.href); }
+}
+function gwCmt(i) {
+  var inp = document.getElementById('ci'+i);
+  var txt = inp.value.trim(); if (!txt) return;
+  var li = document.getElementById('cl'+i);
+  var d = document.createElement('div');
+  d.className = 'gw-citem';
+  d.textContent = txt;
+  li.appendChild(d);
+  inp.value = '';
+}
+</script>
+
+<script>
+// Leaflet CSS ve JS dinamik yükleme
+(function() {
+  // CSS yükle
+  var lCDNs = [
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+  ];
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = lCDNs[0];
+  link.onerror = function() { link.href = lCDNs[1]; };
+  document.head.appendChild(link);
+
+  // JS yükle — 3 CDN fallback
+  var jCDNs = [
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'
+  ];
+  var idx = 0;
+  function load() {
+    if (idx >= jCDNs.length) { initApp(false); return; }
+    var s = document.createElement('script');
+    s.src = jCDNs[idx++];
+    s.onload = function() { initApp(true); };
+    s.onerror = load;
+    document.head.appendChild(s);
+  }
+  load();
+})();
+</script>
